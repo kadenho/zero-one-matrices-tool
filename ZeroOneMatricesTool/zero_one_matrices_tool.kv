@@ -42,7 +42,9 @@
                     size_hint: (.25, 1)
 
                 TextInput:
+                    id: 'matrix_size_text_input'
                     hint_text: 'Enter Size'
+                    input_filter: 'int'
 
                 Widget:
                     size_hint: (.25, 1)
@@ -56,7 +58,6 @@
                 Button:
                     id: 'enter_matrix_size_button'
                     text: 'Enter'
-                    on_press: app.
 
                 Widget:
                     size_hint: (.25, 1)
