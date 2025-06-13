@@ -33,7 +33,7 @@ class SelfFormattingText(Label):
 Define kivy app class
 '''
 
-class ZeroOneMatricesTool(App):
+class zero_one_matrices_tool(App):
     def build(self):
         self.sm = ScreenManager(transition=NoTransition())
         self.sm.add_widget(HomeScreen(name='HomeScreen'))
@@ -43,5 +43,5 @@ class ZeroOneMatricesTool(App):
         return self.sm
 
 if __name__ == '__main__':
-    app = ZeroOneMatricesTool()
+    app = zero_one_matrices_tool()
     app.run()
