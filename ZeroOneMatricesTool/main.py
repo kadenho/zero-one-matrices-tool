@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -11,7 +12,7 @@ class HomeScreen(Screen):
     pass
 
 class EnterMatrixScreen(Screen):
-    pass
+    matrix_size = NumericProperty(0)
 
 class LoadMatrixScreen(Screen):
     pass
@@ -35,12 +36,12 @@ Define kivy app class
 
 class zero_one_matrices_tool(App):
     def build(self):
-        self.sm = ScreenManager(transition=NoTransition())
-        self.sm.add_widget(HomeScreen(name='HomeScreen'))
-        self.sm.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
-        self.sm.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
-        self.sm.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
-        return self.sm
+        screen_manager = ScreenManager(transition=NoTransition())
+        screen_manager.add_widget(HomeScreen(name='HomeScreen'))
+        screen_manager.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
+        screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
+        screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
+        return screen_manager
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()
