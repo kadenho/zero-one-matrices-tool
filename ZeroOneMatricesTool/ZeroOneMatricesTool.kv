@@ -1,3 +1,9 @@
+<SelfFormattingText>
+    color: (0.0, 0.0, 0.0)
+    text_size: self.width, None
+    halign: 'center'
+    valign: 'middle'
+
 <ScreenBoxLayout>
     orientation: 'vertical'
 
@@ -9,10 +15,66 @@
 <HomeScreen>
     BoxLayout:
         orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: (0.95, 0.95, 0.95, 1.0)
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
-        Label:
+        SelfFormattingText:
             text: 'Zero-One Matrices Tool'
-            size_hint: (.1, 1)
-            text_size: self.width, None
-            halign: 'center'
-            valign: 'middle'
+            font_size: '25sp'
+            size_hint: (1, .1)
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, .8)
+
+            SelfFormattingText:
+                text: 'Matrix Size:'
+                font_size: '20sp'
+
+            BoxLayout:
+                orientation: 'horizontal'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                TextInput:
+                    hint_text: 'Enter Size'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            BoxLayout:
+                orientation: 'horizontal'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                Button:
+                    id: 'enterMatrixSizeButton'
+                    text: 'Enter'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            SelfFormattingText:
+                text: 'Or:'
+                font_size: '20sp'
+
+            BoxLayout:
+                orientation: 'horizontal'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                Button:
+                    id: 'loadMatrixButton'
+                    text: 'Load Matrix'
+
+                Widget:
+                    size_hint: (.25, 1)
+        BoxLayout:
+            size_hint: (1, .1)
