@@ -130,6 +130,23 @@ class zero_one_matrices_tool(App):
         self.matrices_stack.append(updated_matrix)
         self.update_displayed_matrix()
 
+    def make_anti_symmetric(self):
+        current_matrix = self.matrices_stack[-1]
+        matrix_size = int(math.sqrt(len(current_matrix)))
+        updated_matrix = {}
+        for i in range(matrix_size):
+            for j in range(i, matrix_size):
+                if i != j:
+                    updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}']
+                    if current_matrix[f'{i},{j}'] == '0':
+                        updated_matrix[f'{j},{i}'] = '1'
+                    elif current_matrix[f'{i},{j}'] == '1':
+                        updated_matrix[f'{j},{i}'] = '0'
+                else:
+                    updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}']
+        self.matrices_stack.append(updated_matrix)
+        self.update_displayed_matrix()
+
     def make_reflexive(self):
         current_matrix = self.matrices_stack[-1]
         matrix_size = int(math.sqrt(len(current_matrix)))
