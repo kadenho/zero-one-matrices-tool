@@ -13,7 +13,7 @@ class HomeScreen(Screen):
     pass
 
 class EnterMatrixScreen(Screen):
-    zero_one_text_inputs = {}
+    matrix = {}
 
 class LoadMatrixScreen(Screen):
     pass
@@ -75,13 +75,13 @@ class zero_one_matrices_tool(App):
         matrix_entry_box = self.root.get_screen('EnterMatrixScreen').ids.matrix_entry_box
         matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
         matrix_entry_box.clear_widgets()
-        self.root.get_screen('EnterMatrixScreen').zero_one_text_inputs.clear()
+        self.root.get_screen('EnterMatrixScreen').matrix.clear()
         for i in range(matrix_size):
             row_box = BoxLayout(orientation='horizontal')
             matrix_entry_box.add_widget(row_box)
             for j in range(matrix_size):
                 zero_one_text_input = ZeroOneTextInput(hint_text='0/1', font_size='10sp', write_tab=False,  multiline=False)
-                self.root.get_screen('EnterMatrixScreen').zero_one_text_inputs[f'{i},{j}'] = zero_one_text_input
+                self.root.get_screen('EnterMatrixScreen').matrix[f'{i},{j}'] = zero_one_text_input
                 row_box.add_widget(zero_one_text_input)
 
 if __name__ == '__main__':
