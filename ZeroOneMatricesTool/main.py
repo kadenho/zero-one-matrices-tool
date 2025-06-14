@@ -63,6 +63,8 @@ Define kivy app class
 '''
 
 class zero_one_matrices_tool(App):
+    matrices_stack = []
+
     def build(self):
         screen_manager = ScreenManager(transition=NoTransition())
         screen_manager.add_widget(HomeScreen(name='HomeScreen'))
@@ -83,6 +85,31 @@ class zero_one_matrices_tool(App):
                 zero_one_text_input = ZeroOneTextInput(hint_text='0/1', font_size='10sp', write_tab=False,  multiline=False)
                 self.root.get_screen('EnterMatrixScreen').entered_matrix[f'{i},{j}'] = zero_one_text_input
                 row_box.add_widget(zero_one_text_input)
+
+    def stack_entered_matrix(self):
+        self.matrices_stack.clear()
+        matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
+        matrix = {}
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                entry_value = self.root.get_screen('EnterMatrixScreen').entered_matrix[f'{i},{j}'].text
+                if entry_value == '':
+                    entry_value = '0'
+                matrix[f'{i},{j}'] = entry_value
+        self.matrices_stack.append(matrix)
+        self.update_displayed_matrix()
+
+    def update_displayed_matrix(self):
+        matrix_display_box = self.root.get_screen('MatrixEditorScreen').ids.matrix_editor_display_box
+        matrix_display_box.clear_widgets()
+        matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
+        displayed_matrix = self.matrices_stack[-1]
+        for i in range(matrix_size):
+            row_box = BoxLayout(orientation='horizontal')
+            matrix_display_box.add_widget(row_box)
+            for j in range(matrix_size):
+                matrix_display_label = SelfFormattingText(text=displayed_matrix[f'{i},{j}'])
+                row_box.add_widget(matrix_display_label)
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()

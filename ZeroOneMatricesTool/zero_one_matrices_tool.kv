@@ -133,7 +133,7 @@
                         id: enter_matrix_size_button
                         text: 'Next'
                         on_press:
-                            app.build_matrix_entry_box()
+                            app.stack_entered_matrix()
                             app.root.current = 'MatrixEditorScreen'
 
                     Widget:
@@ -192,5 +192,6 @@
                         id: matrix_editor_equivalent_button
                         text: 'Make Equivalent'
         BoxLayout:
+            orientation: 'vertical'
             id: matrix_editor_display_box
             size_hint: (1, 0.75)
