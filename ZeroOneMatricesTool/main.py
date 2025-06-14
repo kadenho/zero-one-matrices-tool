@@ -13,7 +13,7 @@ class HomeScreen(Screen):
     pass
 
 class EnterMatrixScreen(Screen):
-    pass
+    zero_one_text_inputs = {}
 
 class LoadMatrixScreen(Screen):
     pass
@@ -31,7 +31,7 @@ class ScreenBoxLayout(BoxLayout):
 class SelfFormattingText(Label):
     pass
 
-class OneZeroTextInput(TextInput):
+class ZeroOneTextInput(TextInput):
     pat = re.compile('[^01]')
 
     def insert_text(self, substring, from_undo=False):
@@ -40,7 +40,7 @@ class OneZeroTextInput(TextInput):
 
         # Only insert if field is empty and s is not empty
         if not self.text and s:
-            self.text = s[0]  # Only take the first valid character
+            return super().insert_text(s[0], from_undo=from_undo)
         return
 
 class MatrixSizeTextInput(TextInput):
@@ -75,11 +75,14 @@ class zero_one_matrices_tool(App):
         matrix_entry_box = self.root.get_screen('EnterMatrixScreen').ids.matrix_entry_box
         matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
         matrix_entry_box.clear_widgets()
+        self.root.get_screen('EnterMatrixScreen').zero_one_text_inputs.clear()
         for i in range(matrix_size):
             row_box = BoxLayout(orientation='horizontal')
             matrix_entry_box.add_widget(row_box)
             for j in range(matrix_size):
-                row_box.add_widget(OneZeroTextInput(hint_text='0/1', font_size='10sp', is_focusable=True, write_tab=False, input_filter='int', multiline=False))
+                zero_one_text_input = ZeroOneTextInput(hint_text='0/1', font_size='10sp', write_tab=False,  multiline=False)
+                self.root.get_screen('EnterMatrixScreen').zero_one_text_inputs[f'{i},{j}'] = zero_one_text_input
+                row_box.add_widget(zero_one_text_input)
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()
