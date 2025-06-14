@@ -155,6 +155,8 @@
                     Button:
                         id: matrix_editor_undo_button
                         text: 'Undo'
+                        on_press:
+                            app.undo_operation()
 
                     Button:
                         id: matrix_editor_save_button

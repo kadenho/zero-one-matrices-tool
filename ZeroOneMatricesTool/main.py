@@ -112,6 +112,11 @@ class zero_one_matrices_tool(App):
                 matrix_display_label = SelfFormattingText(text=displayed_matrix[f'{i},{j}'])
                 row_box.add_widget(matrix_display_label)
 
+    def undo_operation(self):
+        if len(self.matrices_stack) > 1:
+            self.matrices_stack.pop(-1)
+            self.update_displayed_matrix()
+
     def make_irreflexive(self):
         current_matrix = self.matrices_stack[-1]
         matrix_size = int(math.sqrt(len(current_matrix)))
