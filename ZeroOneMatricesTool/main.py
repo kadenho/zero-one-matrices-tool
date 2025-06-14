@@ -43,6 +43,21 @@ class OneZeroTextInput(TextInput):
             self.text = s[0]  # Only take the first valid character
         return
 
+class MatrixSizeTextInput(TextInput):
+    def insert_text(self, substring, from_undo=False):
+        # Preview what the new text would be
+        new_text = self.text[:self.cursor_index()] + substring + self.text[self.cursor_index():]
+
+        # Allow only digits
+        if not new_text.isdigit():
+            return
+
+        # Allow only numbers from 1 to 20
+        if not (1 <= int(new_text) <= 20):
+            return
+
+        return super().insert_text(substring, from_undo=from_undo)
+
 '''
 Define kivy app class
 '''

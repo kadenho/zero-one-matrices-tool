@@ -52,10 +52,9 @@
                 Widget:
                     size_hint: (.25, 1)
 
-                TextInput:
+                MatrixSizeTextInput:
                     id: matrix_size_text_input
-                    hint_text: 'Enter Size'
-                    input_filter: 'int'
+                    hint_text: 'Enter Size (1-20)'
 
                 Widget:
                     size_hint: (.25, 1)
@@ -104,11 +103,12 @@
             orientation: 'vertical'
 
             SelfFormattingText:
+                size_hint: (1, 0.125)
                 text: 'Enter Matrix:'
                 font_size: '20sp'
 
             BoxLayout:
-
+                size_hint: (1, 0.75)
                 Widget:
                     size_hint: (.25, 1)
 
@@ -121,6 +121,7 @@
 
             BoxLayout:
                 orientation: 'vertical'
+                size_hint: (1, 0.125)
 
                 BoxLayout:
                     size_hint: (1, 0.5)
