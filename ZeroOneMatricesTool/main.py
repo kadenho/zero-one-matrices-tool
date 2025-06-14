@@ -1,3 +1,4 @@
+import math
 import re
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -102,14 +103,27 @@ class zero_one_matrices_tool(App):
     def update_displayed_matrix(self):
         matrix_display_box = self.root.get_screen('MatrixEditorScreen').ids.matrix_editor_display_box
         matrix_display_box.clear_widgets()
-        matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
         displayed_matrix = self.matrices_stack[-1]
+        matrix_size = int(math.sqrt(len(displayed_matrix)))
         for i in range(matrix_size):
             row_box = BoxLayout(orientation='horizontal')
             matrix_display_box.add_widget(row_box)
             for j in range(matrix_size):
                 matrix_display_label = SelfFormattingText(text=displayed_matrix[f'{i},{j}'])
                 row_box.add_widget(matrix_display_label)
+
+    def make_irreflexive(self):
+        current_matrix = self.matrices_stack[-1]
+        matrix_size = int(math.sqrt(len(current_matrix)))
+        updated_matrix = {}
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                if i == j:
+                    updated_matrix[f'{i},{j}'] = '0'
+                else:
+                    updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}']
+        self.matrices_stack.append(updated_matrix)
+        self.update_displayed_matrix()
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()
