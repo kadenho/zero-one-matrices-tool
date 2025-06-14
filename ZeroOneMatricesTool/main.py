@@ -204,14 +204,11 @@ class zero_one_matrices_tool(App):
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = current_matrix.copy()  # new matrix to be built
-
         for k in range(matrix_size):
             for i in range(matrix_size):
                 for j in range(matrix_size):
                     ik = updated_matrix[f'{i},{k}']
                     kj = updated_matrix[f'{k},{j}']
-                    ij = updated_matrix[f'{i},{j}']
-
                     if ik == '1' and kj == '1':
                         updated_matrix[f'{i},{j}'] = '1'
 
