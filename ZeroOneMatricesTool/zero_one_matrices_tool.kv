@@ -104,7 +104,7 @@
 
             SelfFormattingText:
                 size_hint: (1, 0.125)
-                text: 'Enter Matrix:'
+                text: 'Enter Matrix (empty treated as 0):'
                 font_size: '20sp'
 
             BoxLayout:
@@ -141,3 +141,56 @@
 
                 Widget:
                     size_hint: (1, 0.5)
+
+<MatrixEditorScreen>
+    ScreenBoxLayout:
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: (1, 0.25)
+            BoxLayout:
+                orientation: 'vertical'
+
+                BoxLayout:
+
+                    Button:
+                        id: matrix_editor_undo_button
+                        text: 'Undo'
+
+                    Button:
+                        id: matrix_editor_save_button
+                        text: 'Save Matrix'
+
+                BoxLayout:
+
+                    Button:
+                        id: matrix_editor_irreflexive_button
+                        text: 'Make Irreflexive'
+
+                    Button:
+                        id: matrix_editor_anti_symmetric_button
+                        text: 'Make Anti-Symmetric'
+
+                    Button:
+                        id: matrix_editor_asymmetric_button
+                        text: 'Make Asymmetric'
+
+                BoxLayout:
+
+                    Button:
+                        id: matrix_editor_reflexive_button
+                        text: 'Make Reflexive'
+
+                    Button:
+                        id: matrix_editor_symmetric_button
+                        text: 'Make Symmetric'
+
+                    Button:
+                        id: matrix_editor_transitive_button
+                        text: 'Make Transitive'
+
+                    Button:
+                        id: matrix_editor_equivalent_button
+                        text: 'Make Equivalent'
+        BoxLayout:
+            id: matrix_editor_display_box
+            size_hint: (1, 0.75)
