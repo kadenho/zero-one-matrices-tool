@@ -1,8 +1,9 @@
+import re
 from kivy.app import App
-from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 
 '''
 Custom Kivy Screen Classes
@@ -12,7 +13,7 @@ class HomeScreen(Screen):
     pass
 
 class EnterMatrixScreen(Screen):
-    matrix_size = NumericProperty(0)
+    pass
 
 class LoadMatrixScreen(Screen):
     pass
@@ -20,15 +21,27 @@ class LoadMatrixScreen(Screen):
 class MatrixEditorScreen(Screen):
     pass
 
-
 '''
 Custom Kivy Widgets Classes
 '''
+
 class ScreenBoxLayout(BoxLayout):
     pass
 
 class SelfFormattingText(Label):
     pass
+
+class OneZeroTextInput(TextInput):
+    pat = re.compile('[^01]')
+
+    def insert_text(self, substring, from_undo=False):
+        # Filter out anything that's not 0 or 1
+        s = re.sub(self.pat, '', substring)
+
+        # Only insert if field is empty and s is not empty
+        if not self.text and s:
+            self.text = s[0]  # Only take the first valid character
+        return
 
 '''
 Define kivy app class
@@ -42,6 +55,16 @@ class zero_one_matrices_tool(App):
         screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
         screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
         return screen_manager
+
+    def build_matrix_entry_box(self):
+        matrix_entry_box = self.root.get_screen('EnterMatrixScreen').ids.matrix_entry_box
+        matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
+        matrix_entry_box.clear_widgets()
+        for i in range(matrix_size):
+            row_box = BoxLayout(orientation='horizontal')
+            matrix_entry_box.add_widget(row_box)
+            for j in range(matrix_size):
+                row_box.add_widget(OneZeroTextInput(hint_text='0/1', font_size='10sp', is_focusable=True, write_tab=False, input_filter='int', multiline=False))
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()

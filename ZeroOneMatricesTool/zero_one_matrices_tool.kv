@@ -6,11 +6,22 @@
 
 <ScreenBoxLayout>
     orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: (0.95, 0.95, 0.95, 1.0)
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
     BoxLayout:
+        size_hint: (1, 0.1)
         orientation: 'horizontal'
         Button:
+            size_hint: (0.125, 1)
             text: 'Home'
+            on_press: app.root.current = 'HomeScreen'
+        Widget:
+            size_hint: (0.875, 1)
 
 <HomeScreen>
     BoxLayout:
@@ -42,7 +53,7 @@
                     size_hint: (.25, 1)
 
                 TextInput:
-                    id: 'matrix_size_text_input'
+                    id: matrix_size_text_input
                     hint_text: 'Enter Size'
                     input_filter: 'int'
 
@@ -56,8 +67,11 @@
                     size_hint: (.25, 1)
 
                 Button:
-                    id: 'enter_matrix_size_button'
+                    id: enter_matrix_size_button
                     text: 'Enter'
+                    on_press:
+                        app.build_matrix_entry_box()
+                        app.root.current = 'EnterMatrixScreen'
 
                 Widget:
                     size_hint: (.25, 1)
@@ -73,10 +87,54 @@
                     size_hint: (.25, 1)
 
                 Button:
-                    id: 'load_matrix_button'
+                    id: load_matrix_button
                     text: 'Load Matrix'
 
                 Widget:
                     size_hint: (.25, 1)
         BoxLayout:
             size_hint: (1, .1)
+
+<EnterMatrixScreen>
+    ScreenBoxLayout:
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            SelfFormattingText:
+                text: 'Enter Matrix:'
+                font_size: '20sp'
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: matrix_entry_box
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            BoxLayout:
+                orientation: 'vertical'
+
+                BoxLayout:
+                    size_hint: (1, 0.5)
+
+                    Widget:
+                        size_hint: (.25, 1)
+
+                    Button:
+                        id: enter_matrix_size_button
+                        text: 'Next'
+                        on_press:
+                            app.build_matrix_entry_box()
+                            app.root.current = 'MatrixEditorScreen'
+
+                    Widget:
+                        size_hint: (.25, 1)
+
+                Widget:
+                    size_hint: (1, 0.5)
