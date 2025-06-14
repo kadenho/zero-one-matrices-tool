@@ -125,6 +125,19 @@ class zero_one_matrices_tool(App):
         self.matrices_stack.append(updated_matrix)
         self.update_displayed_matrix()
 
+    def make_reflexive(self):
+        current_matrix = self.matrices_stack[-1]
+        matrix_size = int(math.sqrt(len(current_matrix)))
+        updated_matrix = {}
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                if i == j:
+                    updated_matrix[f'{i},{j}'] = '1'
+                else:
+                    updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}']
+        self.matrices_stack.append(updated_matrix)
+        self.update_displayed_matrix()
+
 if __name__ == '__main__':
     app = zero_one_matrices_tool()
     app.run()
