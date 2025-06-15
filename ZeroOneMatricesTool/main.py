@@ -192,11 +192,12 @@ class zero_one_matrices_tool(App):
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
-        for i in range(matrix_size):
-            for j in range(i, matrix_size):
-                updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}'] # copy the old value
-                if i != j:
-                    updated_matrix[f'{j},{i}'] = current_matrix[f'{i},{j}']  # match corresponding element for all elements outside the diagonal
+        for i in range(matrix_size): # iterate through the rows
+            for j in range(i, matrix_size): # iterate through the columns
+                if current_matrix[f'{i},{j}'] == '1' or current_matrix[f'{j},{i}'] == '1': # if a one is found in elements under check
+                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '1' # set both elements to 1
+                else: # if neither are a 1
+                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '0' # set both elements to 0
         self.matrices_stack.append(updated_matrix)  # add matrix to te stack
         self.update_displayed_matrix()  # display new matrix
 
@@ -212,6 +213,28 @@ class zero_one_matrices_tool(App):
                     if ik == '1' and kj == '1':
                         updated_matrix[f'{i},{j}'] = '1'
 
+        self.matrices_stack.append(updated_matrix)
+        self.update_displayed_matrix()
+
+    def make_equivalent(self):
+        current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
+        matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
+        updated_matrix = {}  # new matrix to be built
+        for i in range(matrix_size): # iterate through the rows
+            for j in range(matrix_size): # iterate through the columns
+                if i == j:
+                    updated_matrix[f'{i},{j}'] = '1' # set all elements on the diagonal to 1
+                elif current_matrix[f'{i},{j}'] == '1' or current_matrix[f'{j},{i}'] == '1':
+                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '1'
+                else:
+                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '0'
+        for k in range(matrix_size):
+            for i in range(matrix_size):
+                for j in range(matrix_size):
+                    ik = updated_matrix[f'{i},{k}']
+                    kj = updated_matrix[f'{k},{j}']
+                    if ik == '1' and kj == '1':
+                        updated_matrix[f'{i},{j}'] = '1'
         self.matrices_stack.append(updated_matrix)
         self.update_displayed_matrix()
 
