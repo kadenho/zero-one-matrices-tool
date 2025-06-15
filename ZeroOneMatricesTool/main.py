@@ -148,10 +148,10 @@ class zero_one_matrices_tool(App):
             for j in range(i, matrix_size): # iterate through the columns
                 if i != j: # if it is not on the diagonal
                     updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}'] # copy the old value
-                    if current_matrix[f'{i},{j}'] == '0': # make the corresponding element the opposite
-                        updated_matrix[f'{j},{i}'] = '1'
-                    elif current_matrix[f'{i},{j}'] == '1': # make the corresponding element the opposite
-                        updated_matrix[f'{j},{i}'] = '0'
+                    if current_matrix[f'{i},{j}'] == '1': # if element is a 1
+                        updated_matrix[f'{j},{i}'] = '0' # corresponding element must be 0
+                    else: # else (element is a 0)
+                        updated_matrix[f'{j},{i}'] = current_matrix[f'{j},{i}']  # corresponding element can be copied safely
                 else:
                     updated_matrix[f'{i},{j}'] = current_matrix[f'{i},{j}'] # copy the old value for elements on the diagonal
         self.matrices_stack.append(updated_matrix)  # add matrix to te stack
