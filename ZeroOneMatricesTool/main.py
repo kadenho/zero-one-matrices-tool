@@ -7,7 +7,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.textinput import TextInput
-from ZeroOneMatricesTool.database import MatrixDatabase
+from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
 
 '''
