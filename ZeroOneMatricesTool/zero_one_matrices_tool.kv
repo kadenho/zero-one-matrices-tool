@@ -66,7 +66,6 @@
                     size_hint: (.25, 1)
 
                 Button:
-                    id: enter_matrix_size_button
                     text: 'Enter'
                     on_press:
                         app.build_matrix_entry_box()
@@ -86,7 +85,6 @@
                     size_hint: (.25, 1)
 
                 Button:
-                    id: load_matrix_button
                     text: 'Load Matrix'
                     on_press:
                         app.root.current = 'LoadMatrixScreen'
@@ -130,7 +128,6 @@
                         size_hint: (.25, 1)
 
                     Button:
-                        id: enter_matrix_size_button
                         text: 'Next'
                         on_press:
                             app.stack_entered_matrix()
@@ -153,31 +150,28 @@
                 BoxLayout:
 
                     Button:
-                        id: matrix_editor_undo_button
                         text: 'Undo'
                         on_press:
                             app.undo_operation()
 
                     Button:
-                        id: matrix_editor_save_button
                         text: 'Save Matrix'
+                        on_press:
+                            app.root.current = 'SaveMatrixScreen'
 
                 BoxLayout:
 
                     Button:
-                        id: matrix_editor_irreflexive_button
                         text: 'Make Irreflexive'
                         on_press:
                             app.make_irreflexive()
 
                     Button:
-                        id: matrix_editor_anti_symmetric_button
                         text: 'Make Anti-Symmetric'
                         on_press:
                             app.make_anti_symmetric()
 
                     Button:
-                        id: matrix_editor_asymmetric_button
                         text: 'Make Asymmetric'
                         on_press:
                             app.make_asymmetric()
@@ -185,27 +179,79 @@
                 BoxLayout:
 
                     Button:
-                        id: matrix_editor_reflexive_button
                         text: 'Make Reflexive'
                         on_press:
                             app.make_reflexive()
 
                     Button:
-                        id: matrix_editor_symmetric_button
                         text: 'Make Symmetric'
                         on_press:
                             app.make_symmetric()
 
                     Button:
-                        id: matrix_editor_transitive_button
                         text: 'Make Transitive'
                         on_press:
                             app.make_transitive()
 
                     Button:
-                        id: matrix_editor_equivalent_button
                         text: 'Make Equivalent'
         BoxLayout:
             orientation: 'vertical'
             id: matrix_editor_display_box
             size_hint: (1, 0.75)
+
+<SaveMatrixScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: (0.95, 0.95, 0.95, 1.0)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            size_hint: (1, 0.1)
+            orientation: 'horizontal'
+            Button:
+                size_hint: (0.125, 1)
+                text: 'Cancel'
+                on_press: app.root.current = 'MatrixEditorScreen'
+            Widget:
+                size_hint: (0.875, 1)
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            SelfFormattingText:
+                text: 'Save Matrix'
+                font_size: '25sp'
+
+            SelfFormattingText:
+                text: 'Matrix Name'
+                font_size: '20sp'
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                TextInput:
+                    id: save_matrix_name_text_input
+                    hint_text: 'Type Here'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                Button:
+                    text: 'Save Matrix'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            Widget:

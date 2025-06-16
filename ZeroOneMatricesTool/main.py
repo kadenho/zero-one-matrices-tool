@@ -30,6 +30,9 @@ class LoadMatrixScreen(Screen):
 class MatrixEditorScreen(Screen):
     pass
 
+class SaveMatrixScreen(Screen):
+    pass
+
 
 '''
 Custom Kivy Widgets Classes
@@ -94,6 +97,7 @@ class zero_one_matrices_tool(App):
         screen_manager.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
         screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
         screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
+        screen_manager.add_widget(SaveMatrixScreen(name='SaveMatrixScreen'))
         return screen_manager
 
     def build_matrix_entry_box(self):
@@ -266,7 +270,6 @@ class zero_one_matrices_tool(App):
                         updated_matrix[f'{i},{j}'] = '1'
         self.matrices_stack.append(updated_matrix)
         self.update_displayed_matrix()
-
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()
