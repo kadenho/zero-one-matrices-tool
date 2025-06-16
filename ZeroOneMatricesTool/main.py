@@ -1,11 +1,14 @@
 import math
 import re
+import sqlalchemy
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.textinput import TextInput
+from ZeroOneMatricesTool.database import MatrixDatabase
+from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
 
 '''
 Custom Kivy Screen Classes
@@ -76,7 +79,14 @@ Define kivy app class
 
 
 class zero_one_matrices_tool(App):
-    matrices_stack = []
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
+        self.matrix_database = MatrixDatabase(url)
+        self.database_session =self.matrix_database.create_session()
+        self.matrices_stack = []
 
     def build(self):
         screen_manager = ScreenManager(transition=NoTransition())
