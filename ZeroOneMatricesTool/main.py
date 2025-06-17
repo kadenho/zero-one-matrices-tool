@@ -12,6 +12,7 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
+from datetime import datetime
 
 '''
 Custom Kivy Screen Classes
@@ -92,7 +93,7 @@ class MatrixSizeTextInput(TextInput):
 
         return super().insert_text(substring, from_undo=from_undo)
 
-class UsernameTextInput(TextInput):
+class NameTextInput(TextInput):
     def insert_text(self, substring, from_undo=False):
         # Filter out spaces and tabs
         s = "".join([c for c in substring if c != ' ' and c != '\t'])
@@ -122,7 +123,7 @@ class zero_one_matrices_tool(App):
         self.database_session =self.matrix_database.create_session()
         self.screen_manager = ScreenManager(transition=NoTransition())
         self.matrices_stack = []
-        self.users = ListProperty()
+        self.user_id = None
 
     def build(self):
         self.screen_manager.add_widget(SelectUserScreen(name='SelectUserScreen'))
@@ -135,8 +136,10 @@ class zero_one_matrices_tool(App):
         return self.screen_manager
 
     def log_in(self):
-        if self.screen_manager.get_screen('SelectUserScreen').ids.user_select_spinner.text != 'Select User':
-            self.screen_manager.current = 'HomeScreen'
+        selected_user = self.root.get_screen('SelectUserScreen').ids.user_select_spinner.text
+        if selected_user != 'Select User':
+            self.user_id = self.database_session.query(User).filter(User.username == selected_user).one().user_id
+            self.root.current = 'HomeScreen'
         else:
             Popup(title='User not selected', content=Label(text='Must select user!'), size_hint=(0.5,0.5)).open()
 
@@ -328,6 +331,25 @@ class zero_one_matrices_tool(App):
                         updated_matrix[f'{i},{j}'] = '1'
         self.matrices_stack.append(updated_matrix)
         self.update_displayed_matrix()
+
+    def save_matrix(self):
+        matrix_name = self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text
+        if self.database_session.query(Matrix).filter(Matrix.name == matrix_name, Matrix.user_id == self.user_id).count() == 0:
+            current_timestamp = datetime.now()
+            new_matrix = Matrix(user_id=self.user_id, timestamp=current_timestamp, name=matrix_name)
+            self.database_session.add(new_matrix)
+            self.database_session.flush()
+            current_matrix = self.matrices_stack[-1]
+            for key in current_matrix:
+                row, col = map(int, key.split(','))
+                self.database_session.add(MatrixElement(matrix_id=new_matrix.matrix_id, row=row, col=col, value=current_matrix[key]))
+            self.database_session.commit()
+            Popup(title='Success', content=Label(text='Matrix Saved'), size_hint=(0.5, 0.5)).open()
+            self.root.current = 'MatrixEditorScreen'
+            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
+        else:
+            Popup(title='Name taken', content=Label(text='Name already used!'), size_hint=(0.5,0.5)).open()
+            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()

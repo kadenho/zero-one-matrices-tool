@@ -125,7 +125,7 @@
                 Widget:
                     size_hint: (.25, 1)
 
-                UsernameTextInput:
+                NameTextInput:
                     id: create_user_text_input
                     multiline: False
                     hint_text: 'Type Here'
@@ -367,7 +367,7 @@
                 Widget:
                     size_hint: (.25, 1)
 
-                TextInput:
+                NameTextInput:
                     id: save_matrix_name_text_input
                     hint_text: 'Type Here'
 
@@ -382,7 +382,7 @@
                 Button:
                     text: 'Save Matrix'
                     on_press:
-                        app.root.current = 'MatrixEditorScreen'
+                        app.save_matrix()
 
                 Widget:
                     size_hint: (.25, 1)
