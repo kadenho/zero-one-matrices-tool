@@ -36,7 +36,16 @@ class SaveMatrixScreen(Screen):
     pass
 
 class SelectUserScreen(Screen):
-    pass
+    def on_pre_enter(self):
+        self.populate_select_user_spinner()
+
+    def populate_select_user_spinner(self):
+        url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
+        matrix_database = MatrixDatabase(url)
+        screen_database_session = matrix_database.create_session()
+        usernames = screen_database_session.query(User).all()
+        screen_database_session.close()
+        self.ids.user_select_spinner.values = [user.username for user in usernames]
 
 class CreateUserScreen(Screen):
     pass
@@ -95,32 +104,37 @@ Define kivy app class
 
 class zero_one_matrices_tool(App):
 
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
-        self.screen_manager = ScreenManager(transition=NoTransition())
         self.matrix_database = MatrixDatabase(url)
         self.database_session =self.matrix_database.create_session()
+        self.screen_manager = ScreenManager(transition=NoTransition())
         self.matrices_stack = []
         self.users = ListProperty()
 
     def build(self):
-        self.screen_manager.add_widget(HomeScreen(name='HomeScreen'))
         self.screen_manager.add_widget(SelectUserScreen(name='SelectUserScreen'))
         self.screen_manager.add_widget(CreateUserScreen(name='CreateUserScreen'))
-
+        self.screen_manager.add_widget(HomeScreen(name='HomeScreen'))
         self.screen_manager.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
         self.screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
         self.screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
         self.screen_manager.add_widget(SaveMatrixScreen(name='SaveMatrixScreen'))
         return self.screen_manager
 
+    def log_in(self):
+        if self.screen_manager.get_screen('SelectUserScreen').ids.user_select_spinner.text != 'Select User':
+            self.screen_manager.current = 'HomeScreen'
+        else:
+            Popup(title='User not selected', content=Label(text='Must select user!'), size_hint=(0.5,0.5)).open()
+
     def create_user(self):
         entered_username = self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text
         if self.database_session.query(User).filter(User.username == entered_username).count() == 0:
             self.database_session.add(User(username=entered_username))
             self.database_session.commit()
+            self.screen_manager.current = 'SelectUserScreen'
         else:
             Popup(title='Invalid username', content=Label(text='Username taken!'), size_hint=(0.5, 0.5)).open()
 
