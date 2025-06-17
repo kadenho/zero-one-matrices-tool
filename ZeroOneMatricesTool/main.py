@@ -6,6 +6,7 @@ from kivy.app import App
 from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.textinput import TextInput
 from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
@@ -108,6 +109,14 @@ class zero_one_matrices_tool(App):
         screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
         screen_manager.add_widget(SaveMatrixScreen(name='SaveMatrixScreen'))
         return screen_manager
+
+    def create_user(self):
+        entered_username = self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text
+        if self.database_session.query(User).filter(User.username == entered_username).count() == 0:
+            self.database_session.add(User(username=entered_username))
+            self.database_session.commit()
+        else:
+            Popup(title='Invalid username', content=Label(text='Username taken!'), size_hint=(0.5, 0.5)).open()
 
     def build_matrix_entry_box(self):
         matrix_entry_box = self.root.get_screen('EnterMatrixScreen').ids.matrix_entry_box

@@ -77,12 +77,75 @@
                     size_hint: (.25, 1)
                 Button:
                     text: 'Create User'
+                    on_press:
+                        app.root.current = 'CreateUserScreen'
 
                 Widget:
                     size_hint: (.25, 1)
 
         Widget:
             size_hint: (1, 0.25)
+
+<CreateUserScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: (0.95, 0.95, 0.95, 1.0)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            size_hint: (1, 0.1)
+            orientation: 'horizontal'
+            Button:
+                size_hint: (0.125, 1)
+                text: 'Cancel'
+                on_press: app.root.current = 'SelectUserScreen'
+            Widget:
+                size_hint: (0.875, 1)
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            SelfFormattingText:
+                text: 'Create User'
+                font_size: '25sp'
+
+            SelfFormattingText:
+                text: 'Enter Name:'
+                font_size: '20sp'
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                TextInput:
+                    id: create_user_text_input
+                    multiline: False
+                    hint_text: 'Type Here'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                Button:
+                    text: 'Create User'
+                    on_press:
+                        app.root.current = 'SelectUserScreen'
+                        app.create_user()
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            Widget:
+
 
 <HomeScreen>
     BoxLayout:
