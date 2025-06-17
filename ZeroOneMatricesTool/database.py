@@ -21,9 +21,9 @@ class Matrix(Persisted):
 
 class MatrixElement(Persisted):
     __tablename__ = 'matrix_elements'
+    matrix_id = Column(Integer, ForeignKey('matrices.matrix_id', ondelete='CASCADE'), primary_key=True)
     row = Column(Integer, primary_key=True)
     col = Column(Integer, primary_key=True)
-    matrix_id = Column(Integer, ForeignKey('matrices.matrix_id', ondelete = 'CASCADE'), primary_key=True)
     value = Column(Integer, nullable=False)
     matrix = relationship('Matrix', back_populates='matrix_elements')
 
