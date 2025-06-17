@@ -1,9 +1,7 @@
 import math
 import re
-import sqlalchemy
 
 from kivy.app import App
-from kivy.core.window import Window
 from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
