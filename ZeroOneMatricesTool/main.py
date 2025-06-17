@@ -82,6 +82,11 @@ class MatrixSizeTextInput(TextInput):
 
         return super().insert_text(substring, from_undo=from_undo)
 
+class UsernameTextInput(TextInput):
+    def insert_text(self, substring, from_undo=False):
+        # Filter out spaces and tabs
+        s = "".join([c for c in substring if c != ' ' and c != '\t'])
+        super().insert_text(s, from_undo=from_undo)
 
 '''
 Define kivy app class
@@ -94,21 +99,22 @@ class zero_one_matrices_tool(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
+        self.screen_manager = ScreenManager(transition=NoTransition())
         self.matrix_database = MatrixDatabase(url)
         self.database_session =self.matrix_database.create_session()
         self.matrices_stack = []
         self.users = ListProperty()
 
     def build(self):
-        screen_manager = ScreenManager(transition=NoTransition())
-        screen_manager.add_widget(SelectUserScreen(name='SelectUserScreen'))
-        screen_manager.add_widget(CreateUserScreen(name='CreateUserScreen'))
-        screen_manager.add_widget(HomeScreen(name='HomeScreen'))
-        screen_manager.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
-        screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
-        screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
-        screen_manager.add_widget(SaveMatrixScreen(name='SaveMatrixScreen'))
-        return screen_manager
+        self.screen_manager.add_widget(HomeScreen(name='HomeScreen'))
+        self.screen_manager.add_widget(SelectUserScreen(name='SelectUserScreen'))
+        self.screen_manager.add_widget(CreateUserScreen(name='CreateUserScreen'))
+
+        self.screen_manager.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
+        self.screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))
+        self.screen_manager.add_widget(MatrixEditorScreen(name='MatrixEditorScreen'))
+        self.screen_manager.add_widget(SaveMatrixScreen(name='SaveMatrixScreen'))
+        return self.screen_manager
 
     def create_user(self):
         entered_username = self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text
@@ -120,17 +126,24 @@ class zero_one_matrices_tool(App):
 
     def build_matrix_entry_box(self):
         matrix_entry_box = self.root.get_screen('EnterMatrixScreen').ids.matrix_entry_box
-        matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
-        matrix_entry_box.clear_widgets()
-        self.root.get_screen('EnterMatrixScreen').entered_matrix.clear()
-        for i in range(matrix_size):
-            row_box = BoxLayout(orientation='horizontal')
-            matrix_entry_box.add_widget(row_box)
-            for j in range(matrix_size):
-                zero_one_text_input = ZeroOneTextInput(hint_text='0/1', font_size='10sp', write_tab=False,
-                                                       multiline=False)
-                self.root.get_screen('EnterMatrixScreen').entered_matrix[f'{i},{j}'] = zero_one_text_input
-                row_box.add_widget(zero_one_text_input)
+        try:
+            matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
+            matrix_entry_box.clear_widgets()
+            self.root.get_screen('EnterMatrixScreen').entered_matrix.clear()
+            for i in range(matrix_size):
+                row_box = BoxLayout(orientation='horizontal')
+                matrix_entry_box.add_widget(row_box)
+                for j in range(matrix_size):
+                    zero_one_text_input = ZeroOneTextInput(hint_text='0/1', font_size='10sp', write_tab=False,
+                                                           multiline=False)
+                    self.root.get_screen('EnterMatrixScreen').entered_matrix[f'{i},{j}'] = zero_one_text_input
+                    row_box.add_widget(zero_one_text_input)
+            self.screen_manager.current = 'EnterMatrixScreen'
+        except ValueError:
+            if self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text == '':
+                self.screen_manager.current = 'HomeScreen'
+            else:
+                Popup(title='Value Error', content=Label(text='Value Error has occurred!'), size_hint=(0.5, 0.5)).open()
 
     def stack_entered_matrix(self):
         """
