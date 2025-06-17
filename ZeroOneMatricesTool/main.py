@@ -3,11 +3,14 @@ import re
 import sqlalchemy
 
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
+from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
@@ -96,6 +99,16 @@ class UsernameTextInput(TextInput):
         # Filter out spaces and tabs
         s = "".join([c for c in substring if c != ' ' and c != '\t'])
         super().insert_text(s, from_undo=from_undo)
+
+class LimitedDropdown(DropDown):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.max_height = 400
+
+class UserSelectSpinner(Spinner):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.dropdown_cls = LimitedDropdown
 
 '''
 Define kivy app class
