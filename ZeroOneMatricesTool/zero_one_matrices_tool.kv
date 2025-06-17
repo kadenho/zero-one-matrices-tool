@@ -122,7 +122,7 @@
                 Widget:
                     size_hint: (.25, 1)
 
-                TextInput:
+                UsernameTextInput:
                     id: create_user_text_input
                     multiline: False
                     hint_text: 'Type Here'
@@ -188,7 +188,6 @@
                     text: 'Enter'
                     on_press:
                         app.build_matrix_entry_box()
-                        app.root.current = 'EnterMatrixScreen'
 
                 Widget:
                     size_hint: (.25, 1)
@@ -314,6 +313,8 @@
 
                     Button:
                         text: 'Make Equivalent'
+                        on_press:
+                            app.make_equivalent()
         BoxLayout:
             orientation: 'vertical'
             id: matrix_editor_display_box
