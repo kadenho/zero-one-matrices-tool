@@ -145,8 +145,10 @@ class zero_one_matrices_tool(App):
         if self.database_session.query(User).filter(User.username == entered_username).count() == 0:
             self.database_session.add(User(username=entered_username))
             self.database_session.commit()
+            self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text = ''
             self.screen_manager.current = 'SelectUserScreen'
         else:
+            self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text = ''
             Popup(title='Invalid username', content=Label(text='Username taken!'), size_hint=(0.5, 0.5)).open()
 
     def build_matrix_entry_box(self):
