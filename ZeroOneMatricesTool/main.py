@@ -3,6 +3,7 @@ import re
 import sqlalchemy
 
 from kivy.app import App
+from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
@@ -33,6 +34,11 @@ class MatrixEditorScreen(Screen):
 class SaveMatrixScreen(Screen):
     pass
 
+class SelectUserScreen(Screen):
+    pass
+
+class CreateUserScreen(Screen):
+    pass
 
 '''
 Custom Kivy Widgets Classes
@@ -90,9 +96,12 @@ class zero_one_matrices_tool(App):
         self.matrix_database = MatrixDatabase(url)
         self.database_session =self.matrix_database.create_session()
         self.matrices_stack = []
+        self.users = ListProperty()
 
     def build(self):
         screen_manager = ScreenManager(transition=NoTransition())
+        screen_manager.add_widget(SelectUserScreen(name='SelectUserScreen'))
+        screen_manager.add_widget(CreateUserScreen(name='CreateUserScreen'))
         screen_manager.add_widget(HomeScreen(name='HomeScreen'))
         screen_manager.add_widget(EnterMatrixScreen(name='EnterMatrixScreen'))
         screen_manager.add_widget(LoadMatrixScreen(name='LoadMatrixScreen'))

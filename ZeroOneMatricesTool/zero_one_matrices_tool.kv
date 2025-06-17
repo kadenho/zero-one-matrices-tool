@@ -23,7 +23,7 @@
         Widget:
             size_hint: (0.875, 1)
 
-<HomeScreen>
+<SelectUserScreen>
     BoxLayout:
         orientation: 'vertical'
         canvas.before:
@@ -36,7 +36,63 @@
         SelfFormattingText:
             text: 'Zero-One Matrices Tool'
             font_size: '25sp'
-            size_hint: (1, .1)
+            size_hint: (1, .25)
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                Spinner:
+                    id: user_select_spinner
+                    text: 'Select User'
+                    values:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            Widget:
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+
+                Button:
+                    text: 'login'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+            SelfFormattingText:
+                text: 'Or:'
+                font_size: '20sp'
+
+            BoxLayout:
+
+                Widget:
+                    size_hint: (.25, 1)
+                Button:
+                    text: 'Create User'
+
+                Widget:
+                    size_hint: (.25, 1)
+
+        Widget:
+            size_hint: (1, 0.25)
+
+<HomeScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: (0.95, 0.95, 0.95, 1.0)
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
         BoxLayout:
             orientation: 'vertical'
