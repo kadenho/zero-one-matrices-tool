@@ -193,6 +193,7 @@ class zero_one_matrices_tool(App):
                 matrix[f'{i},{j}'] = entry_value  # designate the element key with the entered value
         self.matrices_stack.append(matrix)  # append matrix to the stack
         self.update_displayed_matrix()  # update the displayed matrix
+        app.root.current = 'MatrixEditorScreen'
 
     def update_displayed_matrix(self):
         """
