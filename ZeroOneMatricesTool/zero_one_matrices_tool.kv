@@ -216,7 +216,7 @@
                 Button:
                     text: 'Load Matrix'
                     on_press:
-                        app.root.current = 'LoadMatrixScreen'
+                        app.populate_load_matrix_list()
 
                 Widget:
                     size_hint: (.25, 1)
@@ -266,6 +266,34 @@
 
                 Widget:
                     size_hint: (1, 0.5)
+
+<LoadMatrixScreen>
+    ScreenBoxLayout:
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            SelfFormattingText:
+                text: 'Select Matrix:'
+                font_size: '20sp'
+                size_hint: (1, 0.12)
+
+            BoxLayout:
+                size_hint: (1, 0.12)
+
+                SelfFormattingText:
+                    text: 'Name:'
+                    font_size: '15sp'
+                    size_hint: (.75, 1)
+
+                SelfFormattingText:
+                    text: 'Save Time:'
+                    font_size: '15sp'
+                    size_hint: (.25, 1)
+
+            BoxLayout:
+                id: load_matrix_select_box
+                orientation: 'vertical'
 
 <MatrixEditorScreen>
     ScreenBoxLayout:
