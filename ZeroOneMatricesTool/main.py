@@ -249,7 +249,6 @@ class zero_one_matrices_tool(App):
         elements = self.database_session.query(MatrixElement).filter(MatrixElement.matrix_id == int(matrix_id)).all()
         for element in elements:
             constructed_matrix[f'{element.row},{element.col}'] = str(element.value)
-        print(constructed_matrix)
         self.matrices_stack.append(constructed_matrix)
         self.update_displayed_matrix()  # update the displayed matrix
         app.root.current = 'MatrixEditorScreen'
