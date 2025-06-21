@@ -1,8 +1,9 @@
 import math
 import re
+from datetime import datetime
 
 from kivy.app import App
-from kivy.properties import ListProperty, StringProperty
+from kivy.properties import StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
@@ -14,7 +15,6 @@ from kivy.uix.widget import Widget
 
 from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
-from datetime import datetime
 
 '''
 Custom Kivy Screen Classes
@@ -28,15 +28,19 @@ class HomeScreen(Screen):
 class EnterMatrixScreen(Screen):
     entered_matrix = {}
 
+
 class LoadMatrixScreen(Screen):
     saved_matrices = []
     display_index = 0
 
+
 class MatrixEditorScreen(Screen):
     pass
 
+
 class SaveMatrixScreen(Screen):
     pass
+
 
 class SelectUserScreen(Screen):
     def on_pre_enter(self):
@@ -50,8 +54,10 @@ class SelectUserScreen(Screen):
         screen_database_session.close()
         self.ids.user_select_spinner.values = [user.username for user in usernames]
 
+
 class CreateUserScreen(Screen):
     pass
+
 
 '''
 Custom Kivy Widgets Classes
@@ -94,26 +100,31 @@ class MatrixSizeTextInput(TextInput):
 
         return super().insert_text(substring, from_undo=from_undo)
 
+
 class NameTextInput(TextInput):
     def insert_text(self, substring, from_undo=False):
         # Filter out spaces and tabs
         s = "".join([c for c in substring if c != ' ' and c != '\t'])
         super().insert_text(s, from_undo=from_undo)
 
+
 class LimitedDropdown(DropDown):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.max_height = 400
+
 
 class UserSelectSpinner(Spinner):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.dropdown_cls = LimitedDropdown
 
+
 class LoadMatrixSelectBox(BoxLayout):
     matrix_id = StringProperty()
     matrix_name = StringProperty()
     save_timestamp = StringProperty()
+
 
 '''
 Define kivy app class
@@ -126,7 +137,7 @@ class zero_one_matrices_tool(App):
         super().__init__(**kwargs)
         url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
         self.matrix_database = MatrixDatabase(url)
-        self.database_session =self.matrix_database.create_session()
+        self.database_session = self.matrix_database.create_session()
         self.screen_manager = ScreenManager(transition=NoTransition())
         self.matrices_stack = []
         self.user_id = None
@@ -147,7 +158,7 @@ class zero_one_matrices_tool(App):
             self.user_id = self.database_session.query(User).filter(User.username == selected_user).one().user_id
             self.root.current = 'HomeScreen'
         else:
-            Popup(title='User not selected', content=Label(text='Must select user!'), size_hint=(0.5,0.5)).open()
+            Popup(title='User not selected', content=Label(text='Must select user!'), size_hint=(0.5, 0.5)).open()
 
     def create_user(self):
         entered_username = self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text
@@ -214,7 +225,8 @@ class zero_one_matrices_tool(App):
         load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
         load_screen.ids.load_matrix_select_box.clear_widgets()
         if not load_screen.saved_matrices:
-            load_screen.ids.load_matrix_select_box.add_widget(SelfFormattingText(text='No matrices found!', font_size='30sp'))
+            load_screen.ids.load_matrix_select_box.add_widget(
+                SelfFormattingText(text='No matrices found!', font_size='30sp'))
             app.root.current = 'LoadMatrixScreen'
         else:
             if begin_index + 5 < len(load_screen.saved_matrices):
@@ -227,19 +239,20 @@ class zero_one_matrices_tool(App):
                 matrix_id = str(load_screen.saved_matrices[i].matrix_id)
                 matrix_name = load_screen.saved_matrices[i].name
                 save_timestamp = load_screen.saved_matrices[i].timestamp.strftime("%Y-%m-%d %H:%M:%S")
-                load_screen.ids.load_matrix_select_box.add_widget(LoadMatrixSelectBox(matrix_id=matrix_id, matrix_name=matrix_name, save_timestamp=save_timestamp))
+                load_screen.ids.load_matrix_select_box.add_widget(
+                    LoadMatrixSelectBox(matrix_id=matrix_id, matrix_name=matrix_name, save_timestamp=save_timestamp))
             for i in range(empty_spaces):
                 load_screen.ids.load_matrix_select_box.add_widget(Widget())
 
     def move_load_matrix_list_previous(self):
         load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
-        if load_screen.display_index-5 >= 0:
+        if load_screen.display_index - 5 >= 0:
             load_screen.display_index -= 5
             self.display_load_matrix_list(load_screen.display_index)
 
     def move_load_matrix_list_next(self):
         load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
-        if load_screen.display_index+5 < len(load_screen.saved_matrices):
+        if load_screen.display_index + 5 < len(load_screen.saved_matrices):
             load_screen.display_index += 5
             self.display_load_matrix_list(load_screen.display_index)
 
@@ -396,7 +409,8 @@ class zero_one_matrices_tool(App):
         if matrix_name == '':
             Popup(title='Empty Name', content=Label(text='Name cannot be blank!'), size_hint=(0.5, 0.5)).open()
             self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
-        elif self.database_session.query(Matrix).filter(Matrix.name == matrix_name, Matrix.user_id == self.user_id).count() == 0:
+        elif self.database_session.query(Matrix).filter(Matrix.name == matrix_name,
+                                                        Matrix.user_id == self.user_id).count() == 0:
             current_timestamp = datetime.now()
             new_matrix = Matrix(user_id=self.user_id, timestamp=current_timestamp, name=matrix_name)
             self.database_session.add(new_matrix)
@@ -404,14 +418,16 @@ class zero_one_matrices_tool(App):
             current_matrix = self.matrices_stack[-1]
             for key in current_matrix:
                 row, col = map(int, key.split(','))
-                self.database_session.add(MatrixElement(matrix_id=new_matrix.matrix_id, row=row, col=col, value=current_matrix[key]))
+                self.database_session.add(
+                    MatrixElement(matrix_id=new_matrix.matrix_id, row=row, col=col, value=current_matrix[key]))
             self.database_session.commit()
             Popup(title='Success', content=Label(text='Matrix Saved'), size_hint=(0.5, 0.5)).open()
             self.root.current = 'MatrixEditorScreen'
             self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
         else:
-            Popup(title='Name taken', content=Label(text='Name already used!'), size_hint=(0.5,0.5)).open()
+            Popup(title='Name taken', content=Label(text='Name already used!'), size_hint=(0.5, 0.5)).open()
             self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
+
 
 if __name__ == '__main__':
     app = zero_one_matrices_tool()

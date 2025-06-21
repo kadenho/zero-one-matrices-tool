@@ -4,11 +4,13 @@ from sqlalchemy.orm import sessionmaker, relationship
 
 Persisted = declarative_base()
 
+
 class User(Persisted):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     username = Column(String(256), nullable=False)
     matrices = relationship('Matrix', back_populates='user')
+
 
 class Matrix(Persisted):
     __tablename__ = 'matrices'
@@ -19,6 +21,7 @@ class Matrix(Persisted):
     user = relationship('User', back_populates='matrices')
     matrix_elements = relationship('MatrixElement', back_populates='matrix')
 
+
 class MatrixElement(Persisted):
     __tablename__ = 'matrix_elements'
     matrix_id = Column(Integer, ForeignKey('matrices.matrix_id', ondelete='CASCADE'), primary_key=True)
@@ -26,6 +29,7 @@ class MatrixElement(Persisted):
     col = Column(Integer, primary_key=True)
     value = Column(Integer, nullable=False)
     matrix = relationship('Matrix', back_populates='matrix_elements')
+
 
 class MatrixDatabase(object):
     @staticmethod
