@@ -209,21 +209,6 @@ class zero_one_matrices_tool(App):
         load_screen.display_index = 0
         self.display_load_matrix_list(load_screen.display_index)
         app.root.current = 'LoadMatrixScreen'
-        '''
-        matrix_ids = [row[0] for row in self.database_session.query(Matrix).with_entities(Matrix.matrix_id).filter(Matrix.user_id == self.user_id).all()]
-        if not matrix_ids:
-            load_screen.ids.load_matrix_select_box.add_widget(SelfFormattingText(text='No matrices found!', font_size='30sp'))
-            app.root.current = 'LoadMatrixScreen'
-        else:
-            for id in matrix_ids:
-                constructed_matrix = {}
-                elements = self.database_session.query(MatrixElement).filter(MatrixElement.matrix_id==id).all()
-                for element in elements:
-                    constructed_matrix[f'{element.row},{element.col}'] = element.value
-                load_screen.saved_matrices.append(constructed_matrix)
-            self.display_load_matrix_list(0)
-            app.root.current = 'LoadMatrixScreen'
-        '''
 
     def display_load_matrix_list(self, begin_index):
         load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
@@ -257,6 +242,17 @@ class zero_one_matrices_tool(App):
         if load_screen.display_index+5 < len(load_screen.saved_matrices):
             load_screen.display_index += 5
             self.display_load_matrix_list(load_screen.display_index)
+
+    def stack_saved_matrix(self, matrix_id):
+        self.matrices_stack.clear()  # remove any matrices already in the stack
+        constructed_matrix = {}
+        elements = self.database_session.query(MatrixElement).filter(MatrixElement.matrix_id == int(matrix_id)).all()
+        for element in elements:
+            constructed_matrix[f'{element.row},{element.col}'] = str(element.value)
+        print(constructed_matrix)
+        self.matrices_stack.append(constructed_matrix)
+        self.update_displayed_matrix()  # update the displayed matrix
+        app.root.current = 'MatrixEditorScreen'
 
     def update_displayed_matrix(self):
         """
