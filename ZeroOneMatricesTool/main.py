@@ -394,7 +394,10 @@ class zero_one_matrices_tool(App):
 
     def save_matrix(self):
         matrix_name = self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text
-        if self.database_session.query(Matrix).filter(Matrix.name == matrix_name, Matrix.user_id == self.user_id).count() == 0:
+        if matrix_name == '':
+            Popup(title='Empty Name', content=Label(text='Name cannot be blank!'), size_hint=(0.5, 0.5)).open()
+            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
+        elif self.database_session.query(Matrix).filter(Matrix.name == matrix_name, Matrix.user_id == self.user_id).count() == 0:
             current_timestamp = datetime.now()
             new_matrix = Matrix(user_id=self.user_id, timestamp=current_timestamp, name=matrix_name)
             self.database_session.add(new_matrix)
