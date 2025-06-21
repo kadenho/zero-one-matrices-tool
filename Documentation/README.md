@@ -27,4 +27,4 @@ DB_USER = The username used in your database dialect (commonly root)\
 \
 DB_PASSWORD = The password set on your database
 ### In database_installer.py
-Run the installer
+Run the installer file.
