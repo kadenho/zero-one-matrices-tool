@@ -206,7 +206,8 @@ class zero_one_matrices_tool(App):
         load_screen.ids.load_matrix_select_box.clear_widgets()
         load_screen.saved_matrices.clear()
         load_screen.saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
-        self.display_load_matrix_list(0)
+        load_screen.display_index = 0
+        self.display_load_matrix_list(load_screen.display_index)
         app.root.current = 'LoadMatrixScreen'
         '''
         matrix_ids = [row[0] for row in self.database_session.query(Matrix).with_entities(Matrix.matrix_id).filter(Matrix.user_id == self.user_id).all()]
@@ -245,7 +246,17 @@ class zero_one_matrices_tool(App):
             for i in range(empty_spaces):
                 load_screen.ids.load_matrix_select_box.add_widget(Widget())
 
+    def move_load_matrix_list_previous(self):
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
+        if load_screen.display_index-5 >= 0:
+            load_screen.display_index -= 5
+            self.display_load_matrix_list(load_screen.display_index)
 
+    def move_load_matrix_list_next(self):
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
+        if load_screen.display_index+5 < len(load_screen.saved_matrices):
+            load_screen.display_index += 5
+            self.display_load_matrix_list(load_screen.display_index)
 
     def update_displayed_matrix(self):
         """

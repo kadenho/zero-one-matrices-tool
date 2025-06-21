@@ -304,6 +304,23 @@
                 id: load_matrix_select_box
                 orientation: 'vertical'
 
+            BoxLayout:
+                size_hint: (1, 0.1)
+
+                Button:
+                    text: 'Previous'
+                    size_hint: (.15, 1)
+                    on_press:
+                        app.move_load_matrix_list_previous()
+
+                Widget:
+
+                Button:
+                    text: 'Next'
+                    size_hint: (.15, 1)
+                    on_press:
+                        app.move_load_matrix_list_next()
+
 <MatrixEditorScreen>
     ScreenBoxLayout:
         BoxLayout:
