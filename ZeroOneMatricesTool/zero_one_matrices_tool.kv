@@ -27,6 +27,8 @@
     Button:
         size_hint: (.75, 1)
         text: root.matrix_name
+        on_press:
+            app.stack_saved_matrix(root.matrix_id)
 
     SelfFormattingText:
         size_hint: (0.25, 1)
