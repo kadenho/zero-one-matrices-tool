@@ -2,7 +2,7 @@ import math
 import re
 
 from kivy.app import App
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
@@ -10,6 +10,8 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
+
 from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
 from datetime import datetime
@@ -26,10 +28,9 @@ class HomeScreen(Screen):
 class EnterMatrixScreen(Screen):
     entered_matrix = {}
 
-
 class LoadMatrixScreen(Screen):
-    pass
-
+    saved_matrices = []
+    display_index = 0
 
 class MatrixEditorScreen(Screen):
     pass
@@ -108,6 +109,11 @@ class UserSelectSpinner(Spinner):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.dropdown_cls = LimitedDropdown
+
+class LoadMatrixSelectBox(BoxLayout):
+    matrix_id = StringProperty()
+    matrix_name = StringProperty()
+    save_timestamp = StringProperty()
 
 '''
 Define kivy app class
@@ -194,6 +200,52 @@ class zero_one_matrices_tool(App):
         self.matrices_stack.append(matrix)  # append matrix to the stack
         self.update_displayed_matrix()  # update the displayed matrix
         app.root.current = 'MatrixEditorScreen'
+
+    def populate_load_matrix_list(self):
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
+        load_screen.ids.load_matrix_select_box.clear_widgets()
+        load_screen.saved_matrices.clear()
+        load_screen.saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
+        self.display_load_matrix_list(0)
+        app.root.current = 'LoadMatrixScreen'
+        '''
+        matrix_ids = [row[0] for row in self.database_session.query(Matrix).with_entities(Matrix.matrix_id).filter(Matrix.user_id == self.user_id).all()]
+        if not matrix_ids:
+            load_screen.ids.load_matrix_select_box.add_widget(SelfFormattingText(text='No matrices found!', font_size='30sp'))
+            app.root.current = 'LoadMatrixScreen'
+        else:
+            for id in matrix_ids:
+                constructed_matrix = {}
+                elements = self.database_session.query(MatrixElement).filter(MatrixElement.matrix_id==id).all()
+                for element in elements:
+                    constructed_matrix[f'{element.row},{element.col}'] = element.value
+                load_screen.saved_matrices.append(constructed_matrix)
+            self.display_load_matrix_list(0)
+            app.root.current = 'LoadMatrixScreen'
+        '''
+
+    def display_load_matrix_list(self, begin_index):
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
+        load_screen.ids.load_matrix_select_box.clear_widgets()
+        if not load_screen.saved_matrices:
+            load_screen.ids.load_matrix_select_box.add_widget(SelfFormattingText(text='No matrices found!', font_size='30sp'))
+            app.root.current = 'LoadMatrixScreen'
+        else:
+            if begin_index + 5 < len(load_screen.saved_matrices):
+                end_index = begin_index + 5
+                empty_spaces = 0
+            else:
+                end_index = len(load_screen.saved_matrices)
+                empty_spaces = begin_index + 5 - len(load_screen.saved_matrices)
+            for i in range(begin_index, end_index):
+                matrix_id = str(load_screen.saved_matrices[i].matrix_id)
+                matrix_name = load_screen.saved_matrices[i].name
+                save_timestamp = load_screen.saved_matrices[i].timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                load_screen.ids.load_matrix_select_box.add_widget(LoadMatrixSelectBox(matrix_id=matrix_id, matrix_name=matrix_name, save_timestamp=save_timestamp))
+            for i in range(empty_spaces):
+                load_screen.ids.load_matrix_select_box.add_widget(Widget())
+
+
 
     def update_displayed_matrix(self):
         """

@@ -23,6 +23,15 @@
         Widget:
             size_hint: (0.875, 1)
 
+<LoadMatrixSelectBox>:
+    Button:
+        size_hint: (.75, 1)
+        text: root.matrix_name
+
+    SelfFormattingText:
+        size_hint: (0.25, 1)
+        text: root.save_timestamp
+
 <SelectUserScreen>
     BoxLayout:
         orientation: 'vertical'
