@@ -212,11 +212,17 @@ class zero_one_matrices_tool(App):
         self.update_displayed_matrix()  # update the displayed matrix
         app.root.current = 'MatrixEditorScreen'
 
-    def populate_load_matrix_list(self):
+    def populate_load_matrix_list(self, search_query):
         load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
         load_screen.ids.load_matrix_select_box.clear_widgets()
         load_screen.saved_matrices.clear()
-        load_screen.saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
+        if search_query == '':
+            load_screen.saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
+        else:
+            iterated_saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
+            for matrix in iterated_saved_matrices:
+                if search_query.lower().strip() in matrix.name.lower().strip():
+                    load_screen.saved_matrices.append(matrix)
         load_screen.display_index = 0
         self.display_load_matrix_list(load_screen.display_index)
         app.root.current = 'LoadMatrixScreen'

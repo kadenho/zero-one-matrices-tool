@@ -227,7 +227,7 @@
                 Button:
                     text: 'Load Matrix'
                     on_press:
-                        app.populate_load_matrix_list()
+                        app.populate_load_matrix_list('')
 
                 Widget:
                     size_hint: (.25, 1)
@@ -283,6 +283,22 @@
 
         BoxLayout:
             orientation: 'vertical'
+
+            BoxLayout:
+                size_hint: (1, 0.2)
+
+                Widget:
+
+                NameTextInput:
+                    id: load_matrix_search_text_input
+                    hint_text: 'Enter Search'
+
+                Button:
+                    text: 'Search'
+                    on_press:
+                        app.populate_load_matrix_list(load_matrix_search_text_input.text)
+
+                Widget:
 
             SelfFormattingText:
                 text: 'Select Matrix:'
