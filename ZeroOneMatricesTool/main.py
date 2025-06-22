@@ -162,7 +162,9 @@ class zero_one_matrices_tool(App):
 
     def create_user(self):
         entered_username = self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text
-        if self.database_session.query(User).filter(User.username == entered_username).count() == 0:
+        if entered_username == '':
+            Popup(title='Invalid username', content=Label(text='Username cannot be blank!'), size_hint=(0.5, 0.5)).open()
+        elif self.database_session.query(User).filter(User.username == entered_username).count() == 0:
             self.database_session.add(User(username=entered_username))
             self.database_session.commit()
             self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text = ''
