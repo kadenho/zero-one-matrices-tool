@@ -131,7 +131,7 @@ Define kivy app class
 '''
 
 
-class zero_one_matrices_tool(App):
+class ZeroOneMatricesTool(App):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -438,5 +438,5 @@ class zero_one_matrices_tool(App):
 
 
 if __name__ == '__main__':
-    app = zero_one_matrices_tool()
+    app = ZeroOneMatricesTool()
     app.run()
