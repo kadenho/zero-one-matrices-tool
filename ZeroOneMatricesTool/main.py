@@ -254,6 +254,7 @@ class ZeroOneMatricesTool(App):
             for matrix in iterated_saved_matrices:  # Iterate through all the saved matrices
                 if search_query.lower().strip() in matrix.name.lower().strip():  # If the search query appears in the matrix's name
                     load_screen.saved_matrices.append(matrix)  # Save the matrix to the list of matrices to be displayed
+        load_screen.saved_matrices.reverse()  # Reverse the list so the newest saved matrix is shown first
         load_screen.display_index = 0  # Begin the list at the 0th element
         self.display_load_matrix_list(load_screen.display_index)  # Display the list of saved matrices
         app.root.current = 'LoadMatrixScreen'  # Change the screen to the load matrix screen
