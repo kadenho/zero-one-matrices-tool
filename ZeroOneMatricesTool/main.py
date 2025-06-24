@@ -26,12 +26,12 @@ class HomeScreen(Screen):
 
 
 class EnterMatrixScreen(Screen):
-    entered_matrix = {}
+    entered_matrix = {}  # Stores the matrix the user enters
 
 
 class LoadMatrixScreen(Screen):
-    saved_matrices = []
-    display_index = 0
+    saved_matrices = []  # Saves a list of saved matrices
+    display_index = 0  # Stores the index of the first element currently shown in the load matrix list
 
 
 class MatrixEditorScreen(Screen):
@@ -43,16 +43,20 @@ class SaveMatrixScreen(Screen):
 
 
 class SelectUserScreen(Screen):
-    def on_pre_enter(self):
+    def on_pre_enter(self):  # Runs on enter the screen
         self.populate_select_user_spinner()
 
     def populate_select_user_spinner(self):
+        """
+        Populates the select user spinner with each username in the database
+        """
         url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
         matrix_database = MatrixDatabase(url)
         screen_database_session = matrix_database.create_session()
-        usernames = screen_database_session.query(User).all()
+        users = screen_database_session.query(User).all()  # Query all the users
         screen_database_session.close()
-        self.ids.user_select_spinner.values = [user.username for user in usernames]
+        self.ids.user_select_spinner.values = [user.username for user in
+                                               users]  # Display each user's usernames in the select user spinner
 
 
 class CreateUserScreen(Screen):
@@ -87,15 +91,11 @@ class ZeroOneTextInput(TextInput):
 
 class MatrixSizeTextInput(TextInput):
     def insert_text(self, substring, from_undo=False):
-        # Preview what the new text would be
-        new_text = self.text[:self.cursor_index()] + substring + self.text[self.cursor_index():]
-
-        # Allow only digits
-        if not new_text.isdigit():
+        new_text = self.text[:self.cursor_index()] + substring + self.text[
+                                                                 self.cursor_index():]  # Preview what the new text would be
+        if not new_text.isdigit():  # Allow only digits
             return
-
-        # Allow only numbers from 1 to 20
-        if not (1 <= int(new_text) <= 20):
+        if not (1 <= int(new_text) <= 20):  # Allow only numbers from 1 to 20
             return
 
         return super().insert_text(substring, from_undo=from_undo)
@@ -103,32 +103,31 @@ class MatrixSizeTextInput(TextInput):
 
 class NameTextInput(TextInput):
     def insert_text(self, substring, from_undo=False):
-        # Filter out spaces and tabs
-        s = "".join([c for c in substring if c != ' ' and c != '\t'])
+        s = "".join([c for c in substring if c != ' ' and c != '\t'])  # Filter out spaces and tabs
         super().insert_text(s, from_undo=from_undo)
 
 
 class LimitedDropdown(DropDown):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.max_height = 400
+        self.max_height = 400  # Set the height of the spinner to be 400 pixels, allowing it to be scrollable
 
 
 class UserSelectSpinner(Spinner):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.dropdown_cls = LimitedDropdown
+        self.dropdown_cls = LimitedDropdown  # Use the limited dropdown for the spinner
 
 
 class LoadMatrixSelectBox(BoxLayout):
-    matrix_id = StringProperty()
-    matrix_name = StringProperty()
-    save_timestamp = StringProperty()
+    matrix_id = StringProperty()  # Store the ID of the matrix shown
+    matrix_name = StringProperty()  # Store the matrix's name
+    save_timestamp = StringProperty()  # Store the matrix's created timestamp
 
 
-'''
+"""
 Define kivy app class
-'''
+"""
 
 
 class ZeroOneMatricesTool(App):
@@ -137,9 +136,9 @@ class ZeroOneMatricesTool(App):
         super().__init__(**kwargs)
         url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
         self.matrix_database = MatrixDatabase(url)
-        self.database_session = self.matrix_database.create_session()
-        self.screen_manager = ScreenManager(transition=NoTransition())
-        self.matrices_stack = []
+        self.database_session = self.matrix_database.create_session()  # Session that makes queries the database
+        self.screen_manager = ScreenManager(transition=NoTransition())  # Manages changes between scenes
+        self.matrices_stack = []  # Stack that tracks history in the matrix editor
         self.user_id = None
 
     def build(self):
@@ -153,46 +152,69 @@ class ZeroOneMatricesTool(App):
         return self.screen_manager
 
     def log_in(self):
-        selected_user = self.root.get_screen('SelectUserScreen').ids.user_select_spinner.text
-        if selected_user != 'Select User':
-            self.user_id = self.database_session.query(User).filter(User.username == selected_user).one().user_id
-            self.root.current = 'HomeScreen'
+        """
+        Logs the user in.
+        """
+        selected_user = self.root.get_screen(
+            'SelectUserScreen').ids.user_select_spinner.text  # Gets the username of the selected user
+        if selected_user == 'Select User':  # If no user has been selected
+            Popup(title='User not selected', content=Label(text='Must select user!'),
+                  size_hint=(0.5, 0.5)).open()  # Throw an error
         else:
-            Popup(title='User not selected', content=Label(text='Must select user!'), size_hint=(0.5, 0.5)).open()
+            self.user_id = self.database_session.query(User).filter(
+                User.username == selected_user).one().user_id  # Find the user id of the selected user
+            self.root.current = 'HomeScreen'  # Change the screen to the home screen
 
     def create_user(self):
-        entered_username = self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text
-        if entered_username == '':
-            Popup(title='Invalid username', content=Label(text='Username cannot be blank!'), size_hint=(0.5, 0.5)).open()
-        elif self.database_session.query(User).filter(User.username == entered_username).count() == 0:
-            self.database_session.add(User(username=entered_username))
-            self.database_session.commit()
-            self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text = ''
-            self.screen_manager.current = 'SelectUserScreen'
+        """
+        Adds a new user to the database.
+        """
+        entered_username = self.root.get_screen(
+            'CreateUserScreen').ids.create_user_text_input.text  # Retrieve the username the user entered
+        if entered_username == '':  # If no username has been entered
+            Popup(title='Invalid username', content=Label(text='Username cannot be blank!'),
+                  size_hint=(0.5, 0.5)).open()  # Throw an error
+        elif self.database_session.query(User).filter(
+                User.username == entered_username).count() > 0:  # If the username is already taken
+            self.root.get_screen(
+                'CreateUserScreen').ids.create_user_text_input.text = ''  # Clear the username enter box
+            Popup(title='Invalid username', content=Label(text='Username taken!'),
+                  size_hint=(0.5, 0.5)).open()  # Throw an error
         else:
-            self.root.get_screen('CreateUserScreen').ids.create_user_text_input.text = ''
-            Popup(title='Invalid username', content=Label(text='Username taken!'), size_hint=(0.5, 0.5)).open()
+            self.database_session.add(User(username=entered_username))  # Create the new user
+            self.database_session.commit()  # Commit the change to the database
+            self.root.get_screen(
+                'CreateUserScreen').ids.create_user_text_input.text = ''  # Clear the username enter box
+            self.screen_manager.current = 'SelectUserScreen'  # Change the screen back to the log in screen
 
     def build_matrix_entry_box(self):
-        matrix_entry_box = self.root.get_screen('EnterMatrixScreen').ids.matrix_entry_box
+        """
+        Constructs a BoxLayout with text inputs allowing the user to enter their matrix.
+        """
+        matrix_entry_box = self.root.get_screen(
+            'EnterMatrixScreen').ids.matrix_entry_box  # Get the box where text boxes will be put into
         try:
-            matrix_size = int(self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text)
-            matrix_entry_box.clear_widgets()
-            self.root.get_screen('EnterMatrixScreen').entered_matrix.clear()
-            for i in range(matrix_size):
-                row_box = BoxLayout(orientation='horizontal')
-                matrix_entry_box.add_widget(row_box)
-                for j in range(matrix_size):
+            matrix_size = int(self.root.get_screen(
+                'HomeScreen').ids.matrix_size_text_input.text)  # Retrieve the entered size of the matrix
+            matrix_entry_box.clear_widgets()  # Clear any old widgets
+            self.root.get_screen('EnterMatrixScreen').entered_matrix.clear()  # Clear any old matrices stored
+            for i in range(matrix_size):  # Iterating through the rows
+                row_box = BoxLayout(orientation='horizontal')  # Create a box to put text inputs into
+                matrix_entry_box.add_widget(row_box)  # Add the box onto the screen
+                for j in range(matrix_size):  # Iterating through each spot of the row
                     zero_one_text_input = ZeroOneTextInput(hint_text='0/1', font_size='10sp', write_tab=False,
-                                                           multiline=False)
-                    self.root.get_screen('EnterMatrixScreen').entered_matrix[f'{i},{j}'] = zero_one_text_input
-                    row_box.add_widget(zero_one_text_input)
-            self.screen_manager.current = 'EnterMatrixScreen'
+                                                           multiline=False)  # Create a text entry box
+                    self.root.get_screen('EnterMatrixScreen').entered_matrix[
+                        f'{i},{j}'] = zero_one_text_input  # Link the box to a key for later reference
+                    row_box.add_widget(zero_one_text_input)  # Add text input box into the row box
+            self.screen_manager.current = 'EnterMatrixScreen'  # Change the screen to the matrix editor screen
         except ValueError:
-            if self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text == '':
-                self.screen_manager.current = 'HomeScreen'
+            if self.root.get_screen('HomeScreen').ids.matrix_size_text_input.text == '':  # If no size has been entered
+                Popup(title='Value Error', content=Label(text='Size cannot be blank!'),
+                      size_hint=(0.5, 0.5)).open()  # Throw error
             else:
-                Popup(title='Value Error', content=Label(text='Value Error has occurred!'), size_hint=(0.5, 0.5)).open()
+                Popup(title='Value Error', content=Label(text='Value Error has occurred!'),
+                      size_hint=(0.5, 0.5)).open()  # Throw error
 
     def stack_entered_matrix(self):
         """
@@ -215,64 +237,92 @@ class ZeroOneMatricesTool(App):
         app.root.current = 'MatrixEditorScreen'
 
     def populate_load_matrix_list(self, search_query):
-        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
-        load_screen.ids.load_matrix_select_box.clear_widgets()
-        load_screen.saved_matrices.clear()
-        if search_query == '':
-            load_screen.saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
-        else:
-            iterated_saved_matrices = self.database_session.query(Matrix).filter(Matrix.user_id == self.user_id).all()
-            for matrix in iterated_saved_matrices:
-                if search_query.lower().strip() in matrix.name.lower().strip():
-                    load_screen.saved_matrices.append(matrix)
-        load_screen.display_index = 0
-        self.display_load_matrix_list(load_screen.display_index)
-        app.root.current = 'LoadMatrixScreen'
+        """
+        Populates the list of matrices the user has saved, adhering to the search query
+        :param search_query:
+        :return:
+        """
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')  # Retrieve the load matrix screen
+        load_screen.ids.load_matrix_select_box.clear_widgets()  # Clear any old widgets
+        load_screen.saved_matrices.clear()  # Clear any old saved matrices
+        if search_query == '':  # If the user searches nothing
+            load_screen.saved_matrices = self.database_session.query(Matrix).filter(
+                Matrix.user_id == self.user_id).all()  # Pull all matrices the user has saved
+        else:  # If the user has searched something
+            iterated_saved_matrices = self.database_session.query(Matrix).filter(
+                Matrix.user_id == self.user_id).all()  # Pull all matrices the user has saved
+            for matrix in iterated_saved_matrices:  # Iterate through all the saved matrices
+                if search_query.lower().strip() in matrix.name.lower().strip():  # If the search query appears in the matrix's name
+                    load_screen.saved_matrices.append(matrix)  # Save the matrix to the list of matrices to be displayed
+        load_screen.display_index = 0  # Begin the list at the 0th element
+        self.display_load_matrix_list(load_screen.display_index)  # Display the list of saved matrices
+        app.root.current = 'LoadMatrixScreen'  # Change the screen to the load matrix screen
 
     def display_load_matrix_list(self, begin_index):
-        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
-        load_screen.ids.load_matrix_select_box.clear_widgets()
-        if not load_screen.saved_matrices:
+        """
+        Constructs a BoxLayout with a list of save matrices, showing five at a time, allowing the user to load previously saved matrices
+        :param begin_index:
+        :return:
+        """
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')  # Retrieve the load matrix screen
+        load_screen.ids.load_matrix_select_box.clear_widgets()  # Clear any old widgets in the list display box
+        if not load_screen.saved_matrices:  # If there are no saved matrices
             load_screen.ids.load_matrix_select_box.add_widget(
-                SelfFormattingText(text='No matrices found!', font_size='30sp'))
-            app.root.current = 'LoadMatrixScreen'
+                SelfFormattingText(text='No matrices found!',
+                                   font_size='30sp'))  # Display text notifying the user there are no saved matrices
+            app.root.current = 'LoadMatrixScreen'  # Change the screen to the load matrix screen
         else:
-            if begin_index + 5 < len(load_screen.saved_matrices):
-                end_index = begin_index + 5
-                empty_spaces = 0
-            else:
-                end_index = len(load_screen.saved_matrices)
-                empty_spaces = begin_index + 5 - len(load_screen.saved_matrices)
+            if begin_index + 5 < len(
+                    load_screen.saved_matrices):  # If there are enough matrices left to fill the entire box
+                end_index = begin_index + 5  # Set the end index to be five past the beginning index
+                empty_spaces = 0  # Add zero empty spaces
+            else:  # If there are not enough matrices left to fill the entire box
+                end_index = len(load_screen.saved_matrices)  # Set the end index to the last matrix in the list
+                empty_spaces = begin_index + 5 - len(
+                    load_screen.saved_matrices)  # Determine the number of empty spaces required to fill the entire box
             for i in range(begin_index, end_index):
-                matrix_id = str(load_screen.saved_matrices[i].matrix_id)
-                matrix_name = load_screen.saved_matrices[i].name
-                save_timestamp = load_screen.saved_matrices[i].timestamp.strftime("%Y-%m-%d %H:%M:%S")
                 load_screen.ids.load_matrix_select_box.add_widget(
-                    LoadMatrixSelectBox(matrix_id=matrix_id, matrix_name=matrix_name, save_timestamp=save_timestamp))
-            for i in range(empty_spaces):
+                    LoadMatrixSelectBox(matrix_id=str(load_screen.saved_matrices[i].matrix_id),
+                                        matrix_name=load_screen.saved_matrices[i].name,
+                                        save_timestamp=load_screen.saved_matrices[i].timestamp.strftime(
+                                            "%Y-%m-%d %H:%M:%S")))  # Add the matrix select box widget
+            for i in range(empty_spaces):  # Add the empty spaces required to fill the entire box
                 load_screen.ids.load_matrix_select_box.add_widget(Widget())
 
     def move_load_matrix_list_previous(self):
-        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
-        if load_screen.display_index - 5 >= 0:
-            load_screen.display_index -= 5
-            self.display_load_matrix_list(load_screen.display_index)
+        """
+        Moves the displayed matrices list 5 elements towards the beginning of the list
+        :return:
+        """
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')  # Retrieve the load matrix screen
+        if load_screen.display_index - 5 >= 0:  # If there is room to move the list towards the beginning
+            load_screen.display_index -= 5  # Move the matrix towards the beginning
+            self.display_load_matrix_list(load_screen.display_index)  # Display the new list range
 
     def move_load_matrix_list_next(self):
-        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')
-        if load_screen.display_index + 5 < len(load_screen.saved_matrices):
-            load_screen.display_index += 5
-            self.display_load_matrix_list(load_screen.display_index)
+        """
+        Moves the displayed matrices list 5 elements towards the end of the list
+        :return:
+        """
+        load_screen = self.screen_manager.get_screen('LoadMatrixScreen')  # Retrieve the load matrix screen
+        if load_screen.display_index + 5 < len(load_screen.saved_matrices):  # If there is room to move the list towards the end
+            load_screen.display_index += 5  # Move the list towards the end
+            self.display_load_matrix_list(load_screen.display_index)  # Display the new list range
 
     def stack_saved_matrix(self, matrix_id):
+        """
+        Puts the saved matrix into the matrix editor stack
+        :param matrix_id:
+        :return:
+        """
         self.matrices_stack.clear()  # remove any matrices already in the stack
         constructed_matrix = {}
-        elements = self.database_session.query(MatrixElement).filter(MatrixElement.matrix_id == int(matrix_id)).all()
-        for element in elements:
-            constructed_matrix[f'{element.row},{element.col}'] = str(element.value)
-        self.matrices_stack.append(constructed_matrix)
+        elements = self.database_session.query(MatrixElement).filter(MatrixElement.matrix_id == int(matrix_id)).all()  # Pull all the elements for the matrix
+        for element in elements:  # For each element
+            constructed_matrix[f'{element.row},{element.col}'] = str(element.value)  # Add a key value pair to the dictionary
+        self.matrices_stack.append(constructed_matrix)  # Add the new dictionary defined matrix to the stack
         self.update_displayed_matrix()  # update the displayed matrix
-        app.root.current = 'MatrixEditorScreen'
+        app.root.current = 'MatrixEditorScreen'  # Change screen to the matrix editor
 
     def update_displayed_matrix(self):
         """
@@ -294,11 +344,19 @@ class ZeroOneMatricesTool(App):
                 row_box.add_widget(matrix_display_label)  # add the label
 
     def undo_operation(self):
+        """
+        Removes one matrix from the stack and displays the new top matrix
+        :return:
+        """
         if len(self.matrices_stack) > 1:  # given there are at least two matrices in the stack
             self.matrices_stack.pop(-1)  # remove matrix on the top of the stack
             self.update_displayed_matrix()  # display new matrix
 
     def make_irreflexive(self):
+        """
+        Applies the irreflexive property to the matrix in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
@@ -312,6 +370,10 @@ class ZeroOneMatricesTool(App):
         self.update_displayed_matrix()  # display new matrix
 
     def make_anti_symmetric(self):
+        """
+        Applies the antisymmetric property to the matrix in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
@@ -331,6 +393,10 @@ class ZeroOneMatricesTool(App):
         self.update_displayed_matrix()  # display new matrix
 
     def make_asymmetric(self):
+        """
+        Applies the asymmetric property to the matrix in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
@@ -349,6 +415,10 @@ class ZeroOneMatricesTool(App):
         self.update_displayed_matrix()  # display new matrix
 
     def make_reflexive(self):
+        """
+        Applies the reflexive property to the matrix in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
@@ -363,6 +433,10 @@ class ZeroOneMatricesTool(App):
         self.update_displayed_matrix()  # display new matrix
 
     def make_symmetric(self):
+        """
+        Applies the symmetric property to the matrix in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
@@ -377,6 +451,10 @@ class ZeroOneMatricesTool(App):
         self.update_displayed_matrix()  # display new matrix
 
     def make_transitive(self):
+        """
+        Applies the transitive property to the matrix in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = current_matrix.copy()  # new matrix to be built
@@ -391,6 +469,10 @@ class ZeroOneMatricesTool(App):
         self.update_displayed_matrix()
 
     def make_equivalent(self):
+        """
+        Makes the matrix an equivalence relation in the matrix editor
+        :return:
+        """
         current_matrix = self.matrices_stack[-1]  # retrieve matrix currently displayed
         matrix_size = int(math.sqrt(len(current_matrix)))  # determine the size of the matrix
         updated_matrix = {}  # new matrix to be built
@@ -398,43 +480,46 @@ class ZeroOneMatricesTool(App):
             for j in range(matrix_size):  # iterate through the columns
                 if i == j:
                     updated_matrix[f'{i},{j}'] = '1'  # set all elements on the diagonal to 1
-                elif current_matrix[f'{i},{j}'] == '1' or current_matrix[f'{j},{i}'] == '1':
-                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '1'
-                else:
-                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '0'
-        for k in range(matrix_size):
+                elif current_matrix[f'{i},{j}'] == '1' or current_matrix[f'{j},{i}'] == '1':  # If a one is found in elements under test
+                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '1'  # Set both elements to 1
+                else:  # If neither are 1
+                    updated_matrix[f'{i},{j}'] = updated_matrix[f'{j},{i}'] = '0'  # Set both elements to 0
+        for k in range(matrix_size):  # Warshall's algorithm
             for i in range(matrix_size):
                 for j in range(matrix_size):
                     ik = updated_matrix[f'{i},{k}']
                     kj = updated_matrix[f'{k},{j}']
                     if ik == '1' and kj == '1':
                         updated_matrix[f'{i},{j}'] = '1'
-        self.matrices_stack.append(updated_matrix)
-        self.update_displayed_matrix()
+        self.matrices_stack.append(updated_matrix)  # Stack the new matrix
+        self.update_displayed_matrix()  # Update the displayed matrix
 
     def save_matrix(self):
-        matrix_name = self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text
-        if matrix_name == '':
-            Popup(title='Empty Name', content=Label(text='Name cannot be blank!'), size_hint=(0.5, 0.5)).open()
-            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
+        """
+        Saves the matrix in the matrix editor to the database
+        :return:
+        """
+        matrix_name = self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text  # Retrieve the entered matrix name
+        if matrix_name == '':  # If the name is empty
+            Popup(title='Empty Name', content=Label(text='Name cannot be blank!'), size_hint=(0.5, 0.5)).open()  # Throw an error
         elif self.database_session.query(Matrix).filter(Matrix.name == matrix_name,
-                                                        Matrix.user_id == self.user_id).count() == 0:
-            current_timestamp = datetime.now()
-            new_matrix = Matrix(user_id=self.user_id, timestamp=current_timestamp, name=matrix_name)
-            self.database_session.add(new_matrix)
-            self.database_session.flush()
-            current_matrix = self.matrices_stack[-1]
-            for key in current_matrix:
-                row, col = map(int, key.split(','))
+                                                        Matrix.user_id == self.user_id).count() == 0:  # If the name is not a duplicate
+            current_timestamp = datetime.now()  # Retrieve the current timestamp
+            new_matrix = Matrix(user_id=self.user_id, timestamp=current_timestamp, name=matrix_name)  # Create a matrix database object
+            self.database_session.add(new_matrix)  # Add the matrix database object to the database
+            self.database_session.flush()  # Update database without committing
+            current_matrix = self.matrices_stack[-1]  # Retrieve the current matrix
+            for key in current_matrix:  # For each element in the dictionary defined matrix
+                row, col = map(int, key.split(','))  # Map the key into row and col variables
                 self.database_session.add(
-                    MatrixElement(matrix_id=new_matrix.matrix_id, row=row, col=col, value=current_matrix[key]))
-            self.database_session.commit()
-            Popup(title='Success', content=Label(text='Matrix Saved'), size_hint=(0.5, 0.5)).open()
-            self.root.current = 'MatrixEditorScreen'
-            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
-        else:
-            Popup(title='Name taken', content=Label(text='Name already used!'), size_hint=(0.5, 0.5)).open()
-            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''
+                    MatrixElement(matrix_id=new_matrix.matrix_id, row=row, col=col, value=current_matrix[key]))  # Add a matrix element database object
+            self.database_session.commit()  # Commit the new database information
+            Popup(title='Success', content=Label(text='Matrix Saved'), size_hint=(0.5, 0.5)).open()  # Notify the user the matrix was saved
+            self.root.current = 'MatrixEditorScreen'  # Change the screen back to the matrix editor
+            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''  # Clear the name text input
+        else:  # If the name is a duplicate
+            Popup(title='Name taken', content=Label(text='Name already used!'), size_hint=(0.5, 0.5)).open()  # Throw an error
+            self.root.get_screen('SaveMatrixScreen').ids.save_matrix_name_text_input.text = ''  # Clear the name text input
 
 
 if __name__ == '__main__':
