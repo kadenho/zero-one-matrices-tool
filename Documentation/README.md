@@ -1,6 +1,11 @@
 # zero-one-matrices-tool
 Developed on Python 3.13 \
 Authored by Kaden Ho
+### Status:
+✅ Complete and functional, no known bugs at this time
+
+### Setup:
+
 ### In terminal:
 #### Download required packages:
 mysql-connector-python (or the python connector for your dialect of choice)\
@@ -30,6 +35,8 @@ DB_PASSWORD = The password set on your database
 Run the installer file.
 ### In main.py
 Run the main file.
+
+
 
 ## Creating a user
 To create a user, click on the 'Create User' button on the select user screen. \
