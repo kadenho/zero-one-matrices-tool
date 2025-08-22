@@ -1,8 +1,21 @@
 # zero-one-matrices-tool
+A tool developed to enforce relational properties on 0-1 matrices featuring a GUI.\
 Developed on Python 3.13 \
 Authored by Kaden Ho
 ### Status:
 ✅ Complete and functional, no known bugs at this time
+
+### Packages:
+#### Default python packages:
+math \
+re \
+sys \
+datetime
+#### Other packages:
+kivy version 2.3.1 \
+sqlalchemy version 2.0.40
+
+
 
 ### Setup:
 
@@ -48,7 +61,7 @@ Click your username and then click the 'Login' button.
 
 ## Creating a new matrix
 To create a new matrix, first enter the size of your matrix in the provided text box and click next. \
-Enter either the number 1 or 0 in the text boxes below, and click next. Any unpopulated textboxes will be filled in as a 0 when the uses clicks next.
+Enter either the number 1 or 0 in the text boxes below, and click next. Any unpopulated textboxes will be filled in as a 0 when the user clicks next.
 
 ## Using the matrix editor
 After creating or loading a matrix, use the provided buttons on the third and fourth rows of the matrix editor to apply properties to the matrix. \
