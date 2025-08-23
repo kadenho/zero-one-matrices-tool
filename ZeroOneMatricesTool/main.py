@@ -1,6 +1,8 @@
 import math
 import re
+import sys
 from datetime import datetime
+import json
 
 from kivy.app import App
 from kivy.properties import StringProperty
@@ -14,7 +16,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 
 from ZeroOneMatricesTool.database import MatrixDatabase, User, Matrix, MatrixElement
-from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
 
 '''
 Custom Kivy Screen Classes
@@ -42,6 +43,25 @@ class SaveMatrixScreen(Screen):
     pass
 
 
+def build_matrix_database():
+    file_path = 'config.json'
+    try:
+        with open(file_path) as json_file:
+            data = json.load(json_file)
+            database_host = data["database"]["host"]
+            database_port = data["database"]["port"]
+            database_name = data["database"]["name"]
+            database_user = data["database"]["user"]
+            database_password = data["database"]["password"]
+    except FileNotFoundError:
+        print('config.json not found.')
+        sys.exit(1)
+    url = MatrixDatabase.construct_mysql_url(database_host, int(database_port), database_name, database_user,
+                                             database_password)
+    matrix_database = MatrixDatabase(url)
+    return matrix_database
+
+
 class SelectUserScreen(Screen):
     def on_pre_enter(self):  # Runs on enter the screen
         self.populate_select_user_spinner()
@@ -50,8 +70,7 @@ class SelectUserScreen(Screen):
         """
         Populates the select user spinner with each username in the database
         """
-        url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
-        matrix_database = MatrixDatabase(url)
+        matrix_database = build_matrix_database()
         screen_database_session = matrix_database.create_session()
         users = screen_database_session.query(User).all()
         screen_database_session.close()
@@ -132,8 +151,7 @@ class ZeroOneMatricesTool(App):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        url = MatrixDatabase.construct_mysql_url(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD)
-        self.matrix_database = MatrixDatabase(url)
+        self.matrix_database = build_matrix_database()
         self.database_session = self.matrix_database.create_session()
         self.screen_manager = ScreenManager(transition=NoTransition())
         self.matrices_stack = []
